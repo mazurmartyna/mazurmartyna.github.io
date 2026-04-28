@@ -19,14 +19,14 @@
         
             <div class="form-floating mb-3">
             <input
-                type="popyt"
+                type="text"
                 class="form-control"
                 id="floatingInput"
                 placeholder="[0,0,0,0,20,0,40,0,0,0]"
             />
             <label for="floatingInput">Przewidywany Popyt </label>
             </div>
-            <div><i>przykład: [0,0,0,0,20,0,40,0]</i></div>
+            <div><i>przykład: 0,0,20,40</i></div>
             
             <li>Podaj dane części</li>
             
@@ -221,23 +221,20 @@ let pyodideReady = loadPyodide();
 function renderTables(data) {
   const container = document.getElementById("results");
 
-  // wyczyść stare wyniki
   container.innerHTML = "";
 
-  // iteracja po tabelach (GHP, Obudowa itd.)
   for (const [name, table] of Object.entries(data)) {
 
     let html = `<h2>${name}</h2>`;
-    html += `<table border="1" style="margin-bottom:20px;">`;
+    html += `<table  class="table mx-auto w-auto">`;
 
-    // 🔹 HEADER (okresy)
     html += "<tr><th>Okres</th>";
     table.okresy.forEach(o => {
       html += `<th>${o}</th>`;
     });
     html += "</tr>";
 
-    // 🔹 WIERSZE
+
     for (const [rowName, values] of Object.entries(table.values)) {
       html += `<tr><td>${rowName}</td>`;
 
@@ -257,65 +254,134 @@ function renderTables(data) {
 
 <script>
 async function generateMRP() {
-  const pyodide = await pyodideReady;
+    const pyodide = await pyodideReady;
 
-  // 1. Collect input values
-  const cz_r_dlugopis = Number(document.getElementById("cz_r_Dlugopis").value);
-  const cz_r_obudowa = Number(document.getElementById("cz_r_Obudowa").value);
-  const cz_r_wklad = Number(document.getElementById("cz_r_Wklad").value);
+const rawPopyt = document.getElementById("floatingInput").value;
+
+let popyt;
+
+try {
+  popyt = rawPopyt
+    .split(",")
+    .map(x => x.trim())
+    .filter(x => x !== "")     // 🔥 usuwa puste wartości
+    .map(x => Number(x));
+
+  if (popyt.length === 0) {
+    throw new Error();
+  }
+
+  if (popyt.some(x => isNaN(x))) {
+    throw new Error();
+  }
+
+} catch {
+  alert("Podaj liczby oddzielone przecinkami, np: 0,0,20,40");
+  return;
+}
+  
+    const cz_r_Dlugopis = Number(document.getElementById("cz_r_Dlugopis").value);
+    const cz_r_Obudowa = Number(document.getElementById("cz_r_Obudowa").value);
+    const cz_r_Wklad = Number(document.getElementById("cz_r_Wklad").value);
+    const cz_r_Tusz = Number(document.getElementById("cz_r_Tusz").value);
+    const cz_r_Koncowka = Number(document.getElementById("cz_r_Koncowka").value);
+    const cz_r_Kulka = Number(document.getElementById("cz_r_Kulka").value);
+    const cz_r_Mechanizm = Number(document.getElementById("cz_r_Mechanizm").value);
+    const cz_r_Sprezynka = Number(document.getElementById("cz_r_Sprezynka").value);
+
+    const w_p_Dlugopis = Number(document.getElementById("w_p_Dlugopis").value);
+    const w_p_Obudowa = Number(document.getElementById("w_p_Obudowa").value);
+    const w_p_Wklad = Number(document.getElementById("w_p_Wklad").value);
+    const w_p_Tusz = Number(document.getElementById("w_p_Tusz").value);
+    const w_p_Koncowka = Number(document.getElementById("w_p_Koncowka").value);
+    const w_p_Kulka = Number(document.getElementById("w_p_Kulka").value);
+    const w_p_Mechanizm = Number(document.getElementById("w_p_Mechanizm").value);
+    const w_p_Sprezynka = Number(document.getElementById("w_p_Sprezynka").value);
+
+    const ns_Dlugopis = Number(document.getElementById("ns_Dlugopis").value);
+    const ns_Obudowa = Number(document.getElementById("ns_Obudowa").value);
+    const ns_Wklad = Number(document.getElementById("ns_Wklad").value);
+    const ns_Tusz = Number(document.getElementById("ns_Tusz").value);
+    const ns_Koncowka = Number(document.getElementById("ns_Koncowka").value);
+    const ns_Kulka = Number(document.getElementById("ns_Kulka").value);
+    const ns_Mechanizm = Number(document.getElementById("ns_Mechanizm").value);
+    const ns_Sprezynka = Number(document.getElementById("ns_Sprezynka").value);
 
   // 2. Pass data into Python
-  pyodide.globals.set("cz_r_dlugopis", cz_r_dlugopis);
-  pyodide.globals.set("cz_r_obudowa", cz_r_obudowa);
-  pyodide.globals.set("cz_r_wklad", cz_r_wklad);
+    pyodide.globals.set("popyt", popyt);
+    pyodide.globals.set("cz_r_Dlugopis", cz_r_Dlugopis);
+    pyodide.globals.set("cz_r_Obudowa", cz_r_Obudowa);
+    pyodide.globals.set("cz_r_Wklad", cz_r_Wklad);
+    pyodide.globals.set("cz_r_Tusz", cz_r_Tusz);
+    pyodide.globals.set("cz_r_Koncowka", cz_r_Koncowka);
+    pyodide.globals.set("cz_r_Kulka", cz_r_Kulka);
+    pyodide.globals.set("cz_r_Mechanizm", cz_r_Mechanizm);
+    pyodide.globals.set("cz_r_Sprezynka", cz_r_Sprezynka);
+
+    pyodide.globals.set("w_p_Dlugopis", w_p_Dlugopis);
+    pyodide.globals.set("w_p_Obudowa", w_p_Obudowa);
+    pyodide.globals.set("w_p_Wklad", w_p_Wklad);
+    pyodide.globals.set("w_p_Tusz", w_p_Tusz);
+    pyodide.globals.set("w_p_Koncowka", w_p_Koncowka);
+    pyodide.globals.set("w_p_Kulka", w_p_Kulka);
+    pyodide.globals.set("w_p_Mechanizm", w_p_Mechanizm);
+    pyodide.globals.set("w_p_Sprezynka", w_p_Sprezynka);
+
+    pyodide.globals.set("ns_Dlugopis", ns_Dlugopis);
+    pyodide.globals.set("ns_Obudowa", ns_Obudowa);
+    pyodide.globals.set("ns_Wklad", ns_Wklad);
+    pyodide.globals.set("ns_Tusz", ns_Tusz);
+    pyodide.globals.set("ns_Koncowka", ns_Koncowka);
+    pyodide.globals.set("ns_Kulka", ns_Kulka);
+    pyodide.globals.set("ns_Mechanizm", ns_Mechanizm);
+    pyodide.globals.set("ns_Sprezynka", ns_Sprezynka);
+
 
   // 3. Run your Python logic
   const result = await pyodide.runPythonAsync(`
 import json 
 
+popyt = [int(x) for x in popyt]
+
 BOM = {
-    "Długopis": {"children": [("Obudowa",1), ("Wkład",1), ("Końcówka",1), ("Mechanizm",1)], "lt":cz_r_Dlugopis},
+    "Dlugopis": {"children": [("Obudowa",1), ("Wklad",1), ("Koncowka",1), ("Mechanizm",1)], "lt":cz_r_Dlugopis},
     "Obudowa": {"children": [], "lt":cz_r_Obudowa},
-    "Wkład": {"children": [("Tusz",1)], "lt":cz_r_Wklad},
-    "Końcówka": {"children": [("Kulka",1)], "lt": cz_r_Koncowka},
-    "Mechanizm": {"children": [("Sprężynka",1)], "lt":cz_r_Mechanizm},
+    "Wklad": {"children": [("Tusz",1)], "lt":cz_r_Wklad},
+    "Koncowka": {"children": [("Kulka",1)], "lt": cz_r_Koncowka},
+    "Mechanizm": {"children": [("Sprezynka",1)], "lt":cz_r_Mechanizm},
     "Tusz": {"children": [], "lt":cz_r_Tusz},
     "Kulka": {"children": [], "lt":cz_r_Kulka},
-    "Sprężynka": {"children": [], "lt":cz_r_Sprezynka}
+    "Sprezynka": {"children": [], "lt":cz_r_Sprezynka}
 }
 
-# popyt = [0,0,0,0,20,0,40,0,0,0] # popyt w podanych tygodniach na poziomie 0
-
 na_stanie = {
-    "Długopis": ns_Dlugopis,
-    "Wkład": ns_Wklad,
+    "Dlugopis": ns_Dlugopis,
+    "Wklad": ns_Wklad,
     "Tusz": ns_Tusz,
     "Obudowa": ns_Obudowa,
-    "Końcówka": ns_Koncowka,
+    "Koncowka": ns_Koncowka,
     "Kulka": ns_Kulka,
     "Mechanizm": ns_Mechanizm,
-    "Sprężynka": ns_Sprezynka
+    "Sprezynka": ns_Sprezynka
 }
 
 wielkosc_partii = {
-    "Długopis": w_p_Dlugopis,
-    "Wkład": w_p_Wklad,
+    "Dlugopis": w_p_Dlugopis,
+    "Wklad": w_p_Wklad,
     "Tusz": w_p_Tusz,
     "Obudowa": w_p_Obudowa,
-    "Końcówka": w_p_Koncowka,
+    "Koncowka": w_p_Koncowka,
     "Kulka": w_p_Kulka,
     "Mechanizm": w_p_Mechanizm,
-    "Sprężynka": w_p_Sprezynka
+    "Sprezynka": w_p_Sprezynka
 }
 
-# Algorytm GHP 
 def ghp(popyt, na_stanie):
     n = len(popyt)
     
     produkcja = [0] * n
     dostepne = [0] * n
     
-    # Tydzien 0
     dostepne[0] =  na_stanie - popyt[0]
 
     if dostepne[0] < 0:
@@ -323,8 +389,6 @@ def ghp(popyt, na_stanie):
         produkcja[0] += brak
         dostepne[0] += brak
 
-
-    # Kolejne Tygodnie
     for t in range(1, n):
         dostepne[t] = dostepne[t-1] - popyt[t] 
 
@@ -336,13 +400,11 @@ def ghp(popyt, na_stanie):
     
     return produkcja, dostepne
 
-# Algorytm MRP
-
 def mrp (popyt, lt, na_stanie, wielkosc_partii):
     n = len(popyt)
 
-    zapotrz_net = [0] * n # net_req / zapotrzebowanie net
-    dostepne = [0] * n # projected / przew. na stanie
+    zapotrz_net = [0] * n 
+    dostepne = [0] * n 
     planowane_zamowienia = [0] * n
     planowane_przyjęcia_zam = [0] * n
     
@@ -368,12 +430,15 @@ def mrp (popyt, lt, na_stanie, wielkosc_partii):
             dostepne[t] += wielkosc_partii
 
     return {
-        "calkowite_zapotrzebowanie": popyt,
-        "przewidywane_na_stanie": dostepne,
-        "zapotrzebowanie_netto": zapotrz_net,
-        "planowane_zamowienia": planowane_zamowienia,
-        "planowane_przyjecia": planowane_przyjęcia_zam
+    "okresy": list(range(1, n+1)),
+    "values": {
+        "Calkowite": popyt,
+        "Dostepne": dostepne,
+        "Netto": zapotrz_net,
+        "Zamowienia": planowane_zamowienia,
+        "Przyjecia": planowane_przyjęcia_zam
     }
+}
 
 def run_mrp(product, produkcja_ghp, BOM, na_stanie, wielkosc_partii):
     results = {}
@@ -384,7 +449,7 @@ def run_mrp(product, produkcja_ghp, BOM, na_stanie, wielkosc_partii):
         dane = mrp(zapotrzebowanie, lt, na_stanie.get(item,0), wielkosc_partii.get(item,1))
         results[item] = dane
 
-        planned_orders = dane["planowane_zamowienia"]
+        planned_orders = dane["values"]["Zamowienia"]
 
         for child, qty in BOM[item]["children"]:
             child_gross = [0] * len(zapotrzebowanie)
@@ -395,7 +460,6 @@ def run_mrp(product, produkcja_ghp, BOM, na_stanie, wielkosc_partii):
 
             licz_element(child, child_gross)
 
-    # poziom 0 → poziom 1
     for child, qty in BOM[product]["children"]:
         child_gross = [0]*len(produkcja_ghp)
 
@@ -409,9 +473,9 @@ def run_mrp(product, produkcja_ghp, BOM, na_stanie, wielkosc_partii):
     return results
 
 
-produkcja, dostepne = ghp(popyt, na_stanie["Długopis"])
+produkcja, dostepne = ghp(popyt, na_stanie["Dlugopis"])
 
-mrp_wyniki = run_mrp("Długopis", produkcja, BOM, na_stanie, wielkosc_partii)
+mrp_wyniki = run_mrp("Dlugopis", produkcja, BOM, na_stanie, wielkosc_partii)
 
 output = {
     "GHP": {
@@ -425,7 +489,7 @@ output = {
     **mrp_wyniki
 }
 
-json.dumps(output)
+json.dumps(output, default=int)
 
   `);
 

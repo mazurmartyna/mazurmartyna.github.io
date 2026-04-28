@@ -4,6 +4,7 @@ h1 {
 
 h2 {
     color: #4a42bb;
+    padding: 10px;
   }
 
 header {
@@ -13,7 +14,8 @@ header {
 table {
 
     padding: 10px;
-   
+    position: center;
+    width:fit-content
     
 }
 th, td {

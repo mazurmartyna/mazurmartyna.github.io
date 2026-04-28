@@ -1,25 +1,46 @@
-#lt - czas realizacji
-czas_realizacji_0 = 1
-na_stanie_0 = 2
+import json 
+
+popyt = [int(x) for x in popyt]
+
 BOM = {
-    "Długopis": {"children": [("Obudowa",1), ("Wkład",1), ("Końcówka",1), ("Mechanizm",1)], "lt":1},
-    "Obudowa": {"children": [], "lt":2},
-    "Wkład": {"children": [("Tusz",1)], "lt":2},
-    "Końcówka": {"children": [("Kulka",1)], "lt":1},
-    "Mechanizm": {"children": [("Sprężynka",1)], "lt":2},
-    "Tusz": {"children": [], "lt":1},
-    "Kulka": {"children": [], "lt":1},
-    "Sprężynka": {"children": [], "lt":1}
+    "Dlugopis": {"children": [("Obudowa",1), ("Wklad",1), ("Koncowka",1), ("Mechanizm",1)], "lt":cz_r_Dlugopis},
+    "Obudowa": {"children": [], "lt":cz_r_Obudowa},
+    "Wklad": {"children": [("Tusz",1)], "lt":cz_r_Wklad},
+    "Koncowka": {"children": [("Kulka",1)], "lt": cz_r_Koncowka},
+    "Mechanizm": {"children": [("Sprezynka",1)], "lt":cz_r_Mechanizm},
+    "Tusz": {"children": [], "lt":cz_r_Tusz},
+    "Kulka": {"children": [], "lt":cz_r_Kulka},
+    "Sprezynka": {"children": [], "lt":cz_r_Sprezynka}
 }
 
-# Algorytm GHP 
+na_stanie = {
+    "Dlugopis": ns_Dlugopis,
+    "Wklad": ns_Wklad,
+    "Tusz": ns_Tusz,
+    "Obudowa": ns_Obudowa,
+    "Koncowka": ns_Koncowka,
+    "Kulka": ns_Kulka,
+    "Mechanizm": ns_Mechanizm,
+    "Sprezynka": ns_Sprezynka
+}
+
+wielkosc_partii = {
+    "Dlugopis": w_p_Dlugopis,
+    "Wklad": w_p_Wklad,
+    "Tusz": w_p_Tusz,
+    "Obudowa": w_p_Obudowa,
+    "Koncowka": w_p_Koncowka,
+    "Kulka": w_p_Kulka,
+    "Mechanizm": w_p_Mechanizm,
+    "Sprezynka": w_p_Sprezynka
+}
+
 def ghp(popyt, na_stanie):
     n = len(popyt)
     
     produkcja = [0] * n
     dostepne = [0] * n
     
-    # Tydzien 0
     dostepne[0] =  na_stanie - popyt[0]
 
     if dostepne[0] < 0:
@@ -27,8 +48,6 @@ def ghp(popyt, na_stanie):
         produkcja[0] += brak
         dostepne[0] += brak
 
-
-    # Kolejne Tygodnie
     for t in range(1, n):
         dostepne[t] = dostepne[t-1] - popyt[t] 
 
@@ -40,13 +59,11 @@ def ghp(popyt, na_stanie):
     
     return produkcja, dostepne
 
-# Algorytm MRP
-
 def mrp (popyt, lt, na_stanie, wielkosc_partii):
     n = len(popyt)
 
-    zapotrz_net = [0] * n # net_req / zapotrzebowanie net
-    dostepne = [0] * n # projected / przew. na stanie
+    zapotrz_net = [0] * n 
+    dostepne = [0] * n 
     planowane_zamowienia = [0] * n
     planowane_przyjęcia_zam = [0] * n
     
@@ -72,12 +89,15 @@ def mrp (popyt, lt, na_stanie, wielkosc_partii):
             dostepne[t] += wielkosc_partii
 
     return {
-        "calkowite_zapotrzebowanie": popyt,
-        "przewidywane_na_stanie": dostepne,
-        "zapotrzebowanie_netto": zapotrz_net,
-        "planowane_zamowienia": planowane_zamowienia,
-        "planowane_przyjecia": planowane_przyjęcia_zam
+    "okresy": list(range(1, n+1)),
+    "values": {
+        "Calkowite": popyt,
+        "Dostepne": dostepne,
+        "Netto": zapotrz_net,
+        "Zamowienia": planowane_zamowienia,
+        "Przyjecia": planowane_przyjęcia_zam
     }
+}
 
 def run_mrp(product, produkcja_ghp, BOM, na_stanie, wielkosc_partii):
     results = {}
@@ -88,7 +108,7 @@ def run_mrp(product, produkcja_ghp, BOM, na_stanie, wielkosc_partii):
         dane = mrp(zapotrzebowanie, lt, na_stanie.get(item,0), wielkosc_partii.get(item,1))
         results[item] = dane
 
-        planned_orders = dane["planowane_zamowienia"]
+        planned_orders = dane["values"]["Zamowienia"]
 
         for child, qty in BOM[item]["children"]:
             child_gross = [0] * len(zapotrzebowanie)
@@ -99,7 +119,6 @@ def run_mrp(product, produkcja_ghp, BOM, na_stanie, wielkosc_partii):
 
             licz_element(child, child_gross)
 
-    # poziom 0 → poziom 1
     for child, qty in BOM[product]["children"]:
         child_gross = [0]*len(produkcja_ghp)
 
@@ -112,107 +131,21 @@ def run_mrp(product, produkcja_ghp, BOM, na_stanie, wielkosc_partii):
 
     return results
 
-# Wizualizacja 
 
-def drukuj_tabele_ghp(popyt, czas_realizacji, na_stanie, produkcja, dostepne):
-    n = len(popyt)
+produkcja, dostepne = ghp(popyt, na_stanie["Dlugopis"])
 
-    print("GHP")
-    print("")
+mrp_wyniki = run_mrp("Dlugopis", produkcja, BOM, na_stanie, wielkosc_partii)
 
-    print("Okres            ||", end=" ")
-    for i in range(n):
-        print(f"{i+1:3}", end=" ")
-    print()
-
-    print("Popyt            ||", end=" ")
-    for x in popyt:
-        print(f"{x:3}", end=" ")
-    print()
-
-    print("Produkcja        ||", end=" ")
-    for x in produkcja:
-        print(f"{x:3}", end=" ")
-    print()
-
-    print("Dostępne         ||", end=" ")
-    for x in dostepne:
-        print(f"{x:3}", end=" ")
-    print()
-
-    print("\nParametry:")
-    print("Czas realizacji =", czas_realizacji)
-    print("Stan początkowy =", na_stanie)
-    
-def drukuj_tabele_MRP(nazwa, dane):
-    n = len(dane["calkowite_zapotrzebowanie"])
-
-    print(f"\n{nazwa}")
-    print("Okres              ||", end=" ")
-    for i in range(n):
-        print(f"{i+1:3}", end=" ")
-    print()
-
-    print("Całkowite zapotrz. ||", end=" ")
-    for x in dane["calkowite_zapotrzebowanie"]:
-        print(f"{x:3}", end=" ")
-    print()
-
-    
-    print("Przewidywane stan  ||", end=" ")
-    for x in dane["przewidywane_na_stanie"]:
-        print(f"{x:3}", end=" ")
-    print()
-
-    print("Zapotrzebowanie net||", end=" ")
-    for x in dane["zapotrzebowanie_netto"]:
-        print(f"{x:3}", end=" ")
-    print()
-
-    print("Planowane zamów.   ||", end=" ")
-    for x in dane["planowane_zamowienia"]:
-        print(f"{x:3}", end=" ")
-    print()
-    
-    print("Planowane przyjęcia||", end=" ")
-    for x in dane["planowane_przyjecia"]:
-        print(f"{x:3}", end=" ")
-    print()
-
-popyt = [0,0,0,0,20,0,40,0,0,0] # popyt w podanych tygodniach na poziomie 0
-
-na_stanie = {
-    "Długopis": 2,
-    "Wkład": 22,
-    "Tusz": 0
+output = {
+    "GHP": {
+        "okresy": list(range(1, len(popyt)+1)),
+        "values": {
+            "Popyt": popyt,
+            "Produkcja": produkcja,
+            "Dostępne": dostepne
+        }
+    },
+    **mrp_wyniki
 }
 
-wielkosc_partii = {
-    "Długopis": 40,
-    "Wkład": 40,
-    "Tusz": 50,
-    "Obudowa": 40,
-    "Końcówka": 40,
-    "Kulka": 50,
-    "Mechanizm": 40,
-    "Sprężynka": 50
-}
-
-
-czas_realizacji = {
-    "Długopis": cz_r_Dlugopis,
-    "Wkład": cz_r_Wklad,
-    "Tusz": cz_r_Tusz,
-    "Obudowa": cz_r_Obudowa,
-    "Końcówka": cz_r_Koncowka,
-    "Kulka": cz_r_Kulka,
-    "Mechanizm": cz_r_Mechanizm,
-    "Sprężynka": cz_r_Sprezynka
-}
-
-produkcja, dostepne = ghp(popyt, na_stanie["Długopis"])
-wyniki = run_mrp("Długopis", produkcja, BOM, na_stanie, wielkosc_partii)
-
-drukuj_tabele_ghp(popyt, czas_realizacji_0, na_stanie_0, produkcja, dostepne)
-for nazwa, dane in wyniki.items():
-    drukuj_tabele_MRP(nazwa,dane)
+json.dumps(output, default=int)
