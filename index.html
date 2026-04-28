@@ -3,33 +3,415 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.1/css/dataTables.dataTables.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <title>Algorytm MRP</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
     <header class="container sticky-top text-center">
         <h1>Algorytm MRP</h1>
-        <h2>{% block title %} {% endblock %}</h2>
+   
     </header>
     <section class="container">
-        <div class="row">
-            <div class="row">
-            {% block content %}{% endblock %}
+    
+        <ul>
+            <li>Wprowadz wymagane dane</li>
+        
+            <div class="form-floating mb-3">
+            <input
+                type="popyt"
+                class="form-control"
+                id="floatingInput"
+                placeholder="[0,0,0,0,20,0,40,0,0,0]"
+            />
+            <label for="floatingInput">Przewidywany Popyt </label>
             </div>
-        </div>
+            <div><i>przykład: [0,0,0,0,20,0,40,0]</i></div>
+            
+            <li>Podaj dane części</li>
+            
+            <table>
+                <colgroup>
+                    <col style="background-color:rgb(236, 236, 236)">
+                </colgroup>
+                <tr>
+                    <th>Dane Produkcyjne</th>
+                    <th>Długopis</th>
+                    <th>Obudowa</th>
+                    <th>Wkład</th>
+                    <th>Tusz</th>
+                    <th>Końcówka</th>    
+                    <th>Kulka</th>    
+                    <th>Mechanizm</th>  
+                    <th>Sprężynka</th>    
+                </tr>
+                <tr>
+                    <td>Czas Realizacji</td>
+                    <td><input
+                        id="cz_r_Dlugopis"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="cz_r_Obudowa"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="cz_r_Wklad"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="cz_r_Tusz"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="cz_r_Koncowka"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="cz_r_Kulka"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="cz_r_Mechanizm"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="cz_r_Sprezynka"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    
+                </tr>
+                <tr>
+                    <td>Wielkość partii</td>
+                    <td><input
+                        id="w_p_Dlugopis"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="w_p_Obudowa"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="w_p_Wklad"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="w_p_Tusz"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="w_p_Koncowka"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="w_p_Kulka"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="w_p_Mechanizm"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="w_p_Sprezynka"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                </tr>
+                <tr>
+                    <td>Na stanie</td>
+                    <td><input
+                        id="ns_Dlugopis"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="ns_Obudowa"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="ns_Wklad"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="ns_Tusz"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="ns_Koncowka"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="ns_Kulka"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="ns_Mechanizm"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                    <td><input
+                        id="ns_Sprezynka"
+                        type="number"
+                        class="form-control"
+                        /></td>
+                </tr>
+            </table>
+        </ul>
+        <button class="btn  btn-primary" type="submit" onclick="generateMRP()">
+                Generuj MRP
+        </button>
+        <div id="results"></div>
     </section>
     <footer class="container sticky-bottom text-center mt-auto">
         <p>Martyna Mazur, Uniwersytet Ekonomiczny w Krakowie</p>
     </footer>
     
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/2.3.1/js/dataTables.js"></script>
-    {% block script %} {% endblock %}
+   
     
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+<script>
+let pyodideReady = loadPyodide();
+</script>
+
+<script>
+function renderTables(data) {
+  const container = document.getElementById("results");
+
+  // wyczyść stare wyniki
+  container.innerHTML = "";
+
+  // iteracja po tabelach (GHP, Obudowa itd.)
+  for (const [name, table] of Object.entries(data)) {
+
+    let html = `<h2>${name}</h2>`;
+    html += `<table border="1" style="margin-bottom:20px;">`;
+
+    // 🔹 HEADER (okresy)
+    html += "<tr><th>Okres</th>";
+    table.okresy.forEach(o => {
+      html += `<th>${o}</th>`;
+    });
+    html += "</tr>";
+
+    // 🔹 WIERSZE
+    for (const [rowName, values] of Object.entries(table.values)) {
+      html += `<tr><td>${rowName}</td>`;
+
+      values.forEach(v => {
+        html += `<td>${v}</td>`;
+      });
+
+      html += "</tr>";
+    }
+
+    html += "</table>";
+
+    container.innerHTML += html;
+  }
+}
+</script>
+
+<script>
+async function generateMRP() {
+  const pyodide = await pyodideReady;
+
+  // 1. Collect input values
+  const cz_r_dlugopis = Number(document.getElementById("cz_r_Dlugopis").value);
+  const cz_r_obudowa = Number(document.getElementById("cz_r_Obudowa").value);
+  const cz_r_wklad = Number(document.getElementById("cz_r_Wklad").value);
+
+  // 2. Pass data into Python
+  pyodide.globals.set("cz_r_dlugopis", cz_r_dlugopis);
+  pyodide.globals.set("cz_r_obudowa", cz_r_obudowa);
+  pyodide.globals.set("cz_r_wklad", cz_r_wklad);
+
+  // 3. Run your Python logic
+  const result = await pyodide.runPythonAsync(`
+import json 
+
+BOM = {
+    "Długopis": {"children": [("Obudowa",1), ("Wkład",1), ("Końcówka",1), ("Mechanizm",1)], "lt":cz_r_Dlugopis},
+    "Obudowa": {"children": [], "lt":cz_r_Obudowa},
+    "Wkład": {"children": [("Tusz",1)], "lt":cz_r_Wklad},
+    "Końcówka": {"children": [("Kulka",1)], "lt": cz_r_Koncowka},
+    "Mechanizm": {"children": [("Sprężynka",1)], "lt":cz_r_Mechanizm},
+    "Tusz": {"children": [], "lt":cz_r_Tusz},
+    "Kulka": {"children": [], "lt":cz_r_Kulka},
+    "Sprężynka": {"children": [], "lt":cz_r_Sprezynka}
+}
+
+# popyt = [0,0,0,0,20,0,40,0,0,0] # popyt w podanych tygodniach na poziomie 0
+
+na_stanie = {
+    "Długopis": ns_Dlugopis,
+    "Wkład": ns_Wklad,
+    "Tusz": ns_Tusz,
+    "Obudowa": ns_Obudowa,
+    "Końcówka": ns_Koncowka,
+    "Kulka": ns_Kulka,
+    "Mechanizm": ns_Mechanizm,
+    "Sprężynka": ns_Sprezynka
+}
+
+wielkosc_partii = {
+    "Długopis": w_p_Dlugopis,
+    "Wkład": w_p_Wklad,
+    "Tusz": w_p_Tusz,
+    "Obudowa": w_p_Obudowa,
+    "Końcówka": w_p_Koncowka,
+    "Kulka": w_p_Kulka,
+    "Mechanizm": w_p_Mechanizm,
+    "Sprężynka": w_p_Sprezynka
+}
+
+# Algorytm GHP 
+def ghp(popyt, na_stanie):
+    n = len(popyt)
+    
+    produkcja = [0] * n
+    dostepne = [0] * n
+    
+    # Tydzien 0
+    dostepne[0] =  na_stanie - popyt[0]
+
+    if dostepne[0] < 0:
+        brak = -dostepne[0]
+        produkcja[0] += brak
+        dostepne[0] += brak
+
+
+    # Kolejne Tygodnie
+    for t in range(1, n):
+        dostepne[t] = dostepne[t-1] - popyt[t] 
+
+        if dostepne[t] < 0:
+            brak = -dostepne[t]
+            produkcja[t] += brak
+            
+            dostepne[t] += brak
+    
+    return produkcja, dostepne
+
+# Algorytm MRP
+
+def mrp (popyt, lt, na_stanie, wielkosc_partii):
+    n = len(popyt)
+
+    zapotrz_net = [0] * n # net_req / zapotrzebowanie net
+    dostepne = [0] * n # projected / przew. na stanie
+    planowane_zamowienia = [0] * n
+    planowane_przyjęcia_zam = [0] * n
+    
+    dostepne[0] =  na_stanie - popyt[0]
+
+    if dostepne[0] < 0:
+        zapotrz_net[0] = -dostepne[0]
+        
+        planowane_przyjęcia_zam[0] = wielkosc_partii
+        planowane_zamowienia[max(0, 0-lt)] = wielkosc_partii
+        dostepne[0] += wielkosc_partii
+
+    for t in range(1, n):
+        dostepne[t] = dostepne[t-1] + planowane_przyjęcia_zam[t] - popyt[t]
+
+        if dostepne[t] < 0:
+            zapotrz_net[t] = -dostepne[t]
+            planowane_przyjęcia_zam[t] = wielkosc_partii
+
+            tydzien_zamowienia = max(0, t - lt)
+            planowane_zamowienia[tydzien_zamowienia] += wielkosc_partii
+
+            dostepne[t] += wielkosc_partii
+
+    return {
+        "calkowite_zapotrzebowanie": popyt,
+        "przewidywane_na_stanie": dostepne,
+        "zapotrzebowanie_netto": zapotrz_net,
+        "planowane_zamowienia": planowane_zamowienia,
+        "planowane_przyjecia": planowane_przyjęcia_zam
+    }
+
+def run_mrp(product, produkcja_ghp, BOM, na_stanie, wielkosc_partii):
+    results = {}
+
+    def licz_element(item, zapotrzebowanie):
+        lt = BOM[item]["lt"]
+
+        dane = mrp(zapotrzebowanie, lt, na_stanie.get(item,0), wielkosc_partii.get(item,1))
+        results[item] = dane
+
+        planned_orders = dane["planowane_zamowienia"]
+
+        for child, qty in BOM[item]["children"]:
+            child_gross = [0] * len(zapotrzebowanie)
+
+            for t in range(len(zapotrzebowanie)):
+                if planned_orders[t]>0:
+                   child_gross[t] += planned_orders[t] * qty
+
+            licz_element(child, child_gross)
+
+    # poziom 0 → poziom 1
+    for child, qty in BOM[product]["children"]:
+        child_gross = [0]*len(produkcja_ghp)
+
+        for t in range(len(produkcja_ghp)):
+            if produkcja_ghp[t] > 0:
+                t_child = max(0, t - BOM[product]["lt"])
+                child_gross[t_child] += produkcja_ghp[t] * qty
+
+        licz_element(child, child_gross)
+
+    return results
+
+
+produkcja, dostepne = ghp(popyt, na_stanie["Długopis"])
+
+mrp_wyniki = run_mrp("Długopis", produkcja, BOM, na_stanie, wielkosc_partii)
+
+output = {
+    "GHP": {
+        "okresy": list(range(1, len(popyt)+1)),
+        "values": {
+            "Popyt": popyt,
+            "Produkcja": produkcja,
+            "Dostępne": dostepne
+        }
+    },
+    **mrp_wyniki
+}
+
+json.dumps(output)
+
+  `);
+
+const data = JSON.parse(result);
+
+    // 5. Render tables
+console.log(data);
+renderTables(data);
+}
+</script>
 
 </body>
 </html>
