@@ -63,6 +63,7 @@ def mrp (popyt, lt, na_stanie, wielkosc_partii):
     n = len(popyt)
 
     zapotrz_net = [0] * n 
+    plan_przyjecia = [0] * n
     dostepne = [0] * n 
     planowane_zamowienia = [0] * n
     planowane_przyjęcia_zam = [0] * n
@@ -72,30 +73,38 @@ def mrp (popyt, lt, na_stanie, wielkosc_partii):
     if dostepne[0] < 0:
         zapotrz_net[0] = -dostepne[0]
         
-        planowane_przyjęcia_zam[0] = wielkosc_partii
-        planowane_zamowienia[max(0, 0-lt)] = wielkosc_partii
+        if 0 - lt < 0:
+            plan_przyjecia[0] += wielkosc_partii
+        else: 
+            planowane_przyjęcia_zam[0] += wielkosc_partii;
+            planowane_zamowienia[0-lt] += wielkosc_partii
+        
         dostepne[0] += wielkosc_partii
 
     for t in range(1, n):
-        dostepne[t] = dostepne[t-1] + planowane_przyjęcia_zam[t] - popyt[t]
+
+        dostepne[t] = dostepne[t-1] + planowane_przyjęcia_zam[t] + plan_przyjecia[t] - popyt[t]
 
         if dostepne[t] < 0:
             zapotrz_net[t] = -dostepne[t]
-            planowane_przyjęcia_zam[t] = wielkosc_partii
 
-            tydzien_zamowienia = max(0, t - lt)
-            planowane_zamowienia[tydzien_zamowienia] += wielkosc_partii
+            if t-lt < 0:
+                plan_przyjecia[t] += wielkosc_partii
+            else:
+                planowane_przyjęcia_zam[t] += wielkosc_partii
+                planowane_zamowienia[t-lt] += wielkosc_partii
 
             dostepne[t] += wielkosc_partii
 
     return {
     "okresy": list(range(1, n+1)),
     "values": {
-        "Calkowite": popyt,
-        "Dostepne": dostepne,
-        "Netto": zapotrz_net,
-        "Zamowienia": planowane_zamowienia,
-        "Przyjecia": planowane_przyjęcia_zam
+        "Calkowite zapotrzebowanie": popyt,
+        "Planowane przyjecia": plan_przyjecia,
+        "Przewidywane na stanie": dostepne,
+        "Zapotrzebowanie netto": zapotrz_net,
+        "Planowane zamowienia": planowane_zamowienia,
+        "Planowane przyjecia zamowien": planowane_przyjęcia_zam
     }
 }
 
@@ -108,7 +117,7 @@ def run_mrp(product, produkcja_ghp, BOM, na_stanie, wielkosc_partii):
         dane = mrp(zapotrzebowanie, lt, na_stanie.get(item,0), wielkosc_partii.get(item,1))
         results[item] = dane
 
-        planned_orders = dane["values"]["Zamowienia"]
+        planned_orders = dane["values"]["Planowane zamowienia"]
 
         for child, qty in BOM[item]["children"]:
             child_gross = [0] * len(zapotrzebowanie)
@@ -140,12 +149,10 @@ output = {
     "GHP": {
         "okresy": list(range(1, len(popyt)+1)),
         "values": {
-            "Popyt": popyt,
+            "Przewidywany popyt": popyt,
             "Produkcja": produkcja,
             "Dostępne": dostepne
         }
     },
     **mrp_wyniki
 }
-
-json.dumps(output, default=int)

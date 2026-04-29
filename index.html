@@ -10,12 +10,10 @@
 <body class="d-flex flex-column min-vh-100">
     <header class="container sticky-top text-center">
         <h1>Algorytm MRP</h1>
-   
     </header>
     <section class="container">
     
-        <ul>
-            <li>Wprowadz wymagane dane</li>
+        <h3>Wprowadz wymagane dane</h3>
         
             <div class="form-floating mb-3">
             <input
@@ -26,9 +24,9 @@
             />
             <label for="floatingInput">Przewidywany Popyt </label>
             </div>
-            <div><i>przykład: 0,0,20,40</i></div>
+            <div style="text-align: left;"><i>przykład: 0,0,20,40</i></div>
             
-            <li>Podaj dane części</li>
+        <h3>Podaj dane części</h3>
             
             <table>
                 <colgroup>
@@ -202,10 +200,11 @@
             </table>
         </ul>
         <button class="btn  btn-primary" type="submit" onclick="generateMRP()">
-                Generuj MRP
+                Generuj GHP i MRP
         </button>
         <div id="results"></div>
     </section>
+    
     <footer class="container sticky-bottom text-center mt-auto">
         <p>Martyna Mazur, Uniwersytet Ekonomiczny w Krakowie</p>
     </footer>
@@ -222,9 +221,10 @@ function renderTables(data) {
   const container = document.getElementById("results");
 
   container.innerHTML = "";
+  let counter = 0 ;
 
   for (const [name, table] of Object.entries(data)) {
-
+    
     let html = `<h2>${name}</h2>`;
     html += `<table  class="table mx-auto w-auto">`;
 
@@ -233,7 +233,6 @@ function renderTables(data) {
       html += `<th>${o}</th>`;
     });
     html += "</tr>";
-
 
     for (const [rowName, values] of Object.entries(table.values)) {
       html += `<tr><td>${rowName}</td>`;
@@ -247,7 +246,12 @@ function renderTables(data) {
 
     html += "</table>";
 
+    if (counter === 0) {
+      html += "<h2>MRP</h2>";
+    }
+
     container.innerHTML += html;
+    counter ++;
   }
 }
 </script>
@@ -264,7 +268,7 @@ try {
   popyt = rawPopyt
     .split(",")
     .map(x => x.trim())
-    .filter(x => x !== "")     // 🔥 usuwa puste wartości
+    .filter(x => x !== "")    
     .map(x => Number(x));
 
   if (popyt.length === 0) {
@@ -336,9 +340,8 @@ try {
     pyodide.globals.set("ns_Mechanizm", ns_Mechanizm);
     pyodide.globals.set("ns_Sprezynka", ns_Sprezynka);
 
+const result = await pyodide.runPythonAsync(`
 
-  // 3. Run your Python logic
-  const result = await pyodide.runPythonAsync(`
 import json 
 
 popyt = [int(x) for x in popyt]
@@ -404,6 +407,7 @@ def mrp (popyt, lt, na_stanie, wielkosc_partii):
     n = len(popyt)
 
     zapotrz_net = [0] * n 
+    plan_przyjecia = [0] * n
     dostepne = [0] * n 
     planowane_zamowienia = [0] * n
     planowane_przyjęcia_zam = [0] * n
@@ -413,30 +417,38 @@ def mrp (popyt, lt, na_stanie, wielkosc_partii):
     if dostepne[0] < 0:
         zapotrz_net[0] = -dostepne[0]
         
-        planowane_przyjęcia_zam[0] = wielkosc_partii
-        planowane_zamowienia[max(0, 0-lt)] = wielkosc_partii
+        if 0 - lt < 0:
+            plan_przyjecia[0] += wielkosc_partii
+        else: 
+            planowane_przyjęcia_zam[0] += wielkosc_partii;
+            planowane_zamowienia[0-lt] += wielkosc_partii
+        
         dostepne[0] += wielkosc_partii
 
     for t in range(1, n):
-        dostepne[t] = dostepne[t-1] + planowane_przyjęcia_zam[t] - popyt[t]
+
+        dostepne[t] = dostepne[t-1] + planowane_przyjęcia_zam[t] + plan_przyjecia[t] - popyt[t]
 
         if dostepne[t] < 0:
             zapotrz_net[t] = -dostepne[t]
-            planowane_przyjęcia_zam[t] = wielkosc_partii
 
-            tydzien_zamowienia = max(0, t - lt)
-            planowane_zamowienia[tydzien_zamowienia] += wielkosc_partii
+            if t-lt < 0:
+                plan_przyjecia[t] += wielkosc_partii
+            else:
+                planowane_przyjęcia_zam[t] += wielkosc_partii
+                planowane_zamowienia[t-lt] += wielkosc_partii
 
             dostepne[t] += wielkosc_partii
 
     return {
     "okresy": list(range(1, n+1)),
     "values": {
-        "Calkowite": popyt,
-        "Dostepne": dostepne,
-        "Netto": zapotrz_net,
-        "Zamowienia": planowane_zamowienia,
-        "Przyjecia": planowane_przyjęcia_zam
+        "Calkowite zapotrzebowanie": popyt,
+        "Planowane przyjecia": plan_przyjecia,
+        "Przewidywane na stanie": dostepne,
+        "Zapotrzebowanie netto": zapotrz_net,
+        "Planowane zamowienia": planowane_zamowienia,
+        "Planowane przyjecia zamowien": planowane_przyjęcia_zam
     }
 }
 
@@ -449,7 +461,7 @@ def run_mrp(product, produkcja_ghp, BOM, na_stanie, wielkosc_partii):
         dane = mrp(zapotrzebowanie, lt, na_stanie.get(item,0), wielkosc_partii.get(item,1))
         results[item] = dane
 
-        planned_orders = dane["values"]["Zamowienia"]
+        planned_orders = dane["values"]["Planowane zamowienia"]
 
         for child, qty in BOM[item]["children"]:
             child_gross = [0] * len(zapotrzebowanie)
@@ -481,7 +493,7 @@ output = {
     "GHP": {
         "okresy": list(range(1, len(popyt)+1)),
         "values": {
-            "Popyt": popyt,
+            "Przewidywany popyt": popyt,
             "Produkcja": produkcja,
             "Dostępne": dostepne
         }
@@ -495,7 +507,6 @@ json.dumps(output, default=int)
 
 const data = JSON.parse(result);
 
-    // 5. Render tables
 console.log(data);
 renderTables(data);
 }
